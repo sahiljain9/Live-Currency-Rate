@@ -1,5 +1,5 @@
 # Pipeline/features.py
-
+import numpy as np
 
 def calculate_daily_change(current_rate, previous_rate):
     """
@@ -19,3 +19,12 @@ def calculate_weekly_change(current_rate, week_ago_rate):
     if week_ago_rate == 0 or week_ago_rate is None:
         return 0.0
     return round(((current_rate - week_ago_rate) / week_ago_rate) * 100, 4)
+
+def calculate_volatility(rates):
+    """
+    Feature 3: Volatility Score
+    Standard deviation of recent rates.
+    """
+    if not rates or len(rates) < 2:
+        return 0.0
+    return round(float(np.std(rates)), 6)
