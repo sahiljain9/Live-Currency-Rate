@@ -28,3 +28,18 @@ def calculate_volatility(rates):
     if not rates or len(rates) < 2:
         return 0.0
     return round(float(np.std(rates)), 6)
+
+def detect_anomaly(rates, threshold=2.0):
+    """
+    Feature 4: Anomaly Detection
+    Flags the latest rate as 'Anomaly' if it deviates significantly
+    from the recent average, otherwise 'Normal'.
+    """
+    if not rates or len(rates) < 2:
+        return "Normal"
+    mean = np.mean(rates)
+    std = np.std(rates)
+    if std == 0:
+        return "Normal"
+    z = (rates[0] - mean) / std
+    return "Anomaly" if abs(z) > threshold else "Normal"
