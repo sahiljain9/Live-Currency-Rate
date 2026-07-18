@@ -43,3 +43,12 @@ def detect_anomaly(rates, threshold=2.0):
         return "Normal"
     z = (rates[0] - mean) / std
     return "Anomaly" if abs(z) > threshold else "Normal"
+
+def calculate_moving_average(rates):
+    """
+    Feature 5: Moving Average
+    Average of recent rates to show the overall level.
+    """
+    if not rates:
+        return 0.0
+    return round(sum(rates) / len(rates), 6)
