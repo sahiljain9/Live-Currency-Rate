@@ -54,7 +54,7 @@ def calculate_moving_average(rates):
         return 0.0
     return round(sum(rates) / len(rates), 6)
 
-    def get_recent_rates(target_currency, limit=7):
+def get_recent_rates(target_currency, limit=7):
     """
     Fetch recent rates for ONE currency from the raw table, newest first.
     Called in a loop (one currency at a time) to process all currencies.
@@ -71,3 +71,13 @@ def calculate_moving_average(rates):
     cursor.close()
     conn.close()
     return rates
+
+def get_all_currencies():
+    """Get list of all distinct currencies from the raw table."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT DISTINCT target_currency FROM currency_raw_rates")
+    currencies = [row[0] for row in cursor.fetchall()]
+    cursor.close()
+    conn.close()
+    return currencies 
