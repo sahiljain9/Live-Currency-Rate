@@ -1,6 +1,7 @@
 # Pipeline/features.py
 import numpy as np
 from Pipeline.loader import get_connection
+from datetime import datetime, timezone
 
 def calculate_daily_change(current_rate, previous_rate):
     """
@@ -80,4 +81,49 @@ def get_all_currencies():
     currencies = [row[0] for row in cursor.fetchall()]
     cursor.close()
     conn.close()
-    return currencies 
+    return currencies
+
+def save_features():
+    """Compute all five features for every currency and save to currency_features."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    computed_at = datetime.now(timezone.utc)
+
+    currencies = get_all_currencies()
+    saved = 0
+
+    for currency in currencies:
+        rates = get_recent_rates(currency)
+        if len(rates) < 2:
+            continue
+
+        current = rates[0]
+        previous = rates[1]
+        week_ago = rates[-1]
+
+        cursor.execute("""
+            INSERT INTO currency_features
+            (target_currency, current_rate, daily_change_pct, weekly_change_pct,
+             volatility, anomaly_flag, moving_average, computed_at)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+        """, (
+            currency,
+            current,
+            calculate_daily_change(current, previous),
+            calculate_weekly_change(current, week_ago),
+            calculate_volatility(rates),
+            detect_anomaly(rates),
+            calculate_moving_average(rates),
+            computed_at,
+        ))
+        saved += 1
+
+    conn.commit()
+    cursor.close()
+    conn.close()
+    print(f"Saved features for {saved} currencies at {computed_at}")
+    return saved
+
+
+if __name__ == "__main__":
+    save_features()
