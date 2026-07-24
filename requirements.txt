@@ -1,0 +1,7 @@
+﻿azure-functions
+pandas
+mysql-connector-python
+python-dotenv
+requests
+streamlit
+pytest
